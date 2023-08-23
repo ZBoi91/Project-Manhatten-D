@@ -8,12 +8,11 @@ import {
 	Breadcrumbs,
 	Badge,
 } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { ShoppingCart } from '@mui/icons-material';
 import ShoppingContext from '../context/ShoppingContext';
 
 const NavBar = () => {
-	//managing states
 	const [menCategory, setMenCategory] = useState(false);
 	const [womenCategory, setWomenCategory] = useState(false);
 	const [showMenu, setShowMenu] = useState(false);
@@ -21,26 +20,24 @@ const NavBar = () => {
 	const { cartItems } = shoppingCtx;
 	const cartArray = cartItems.items;
 
+	const location = useLocation();
+
 	const handleMenClick = () => {
-		setMenCategory(true);
-
-		if (womenCategory) {
+		if (menCategory) {
+			setShowMenu(!showMenu);
+		} else {
+			setMenCategory(true);
 			setWomenCategory(false);
-		}
-
-		if (!showMenu) {
 			setShowMenu(true);
 		}
 	};
 
 	const handleWomenClick = () => {
-		setWomenCategory(true);
-		setShowMenu(true);
-
-		if (menCategory) {
+		if (womenCategory) {
+			setShowMenu(!showMenu);
+		} else {
+			setWomenCategory(true);
 			setMenCategory(false);
-		}
-		if (!showMenu) {
 			setShowMenu(true);
 		}
 	};
@@ -87,77 +84,81 @@ const NavBar = () => {
 					</Button>
 				</Toolbar>
 			</AppBar>
-			<Box
-				sx={{
-					display: 'flex',
-					flexDirection: 'column',
-					alignItems: 'center',
-					margin: '2rem 0',
-				}}>
-				{/* HEADER NAVBAR FOR MEN AND WOMEN	 */}
-				<Breadcrumbs separator=' '>
-					<Button
-						aria-controls='men-menu'
-						aria-haspopup='true'
-						onClick={handleMenClick}
-						sx={{ color: 'gray' }}>
-						MEN
-					</Button>
-					<Button
-						aria-controls='women-menu'
-						aria-haspopup='true'
-						onClick={handleWomenClick}
-						sx={{ color: 'gray' }}>
-						WOMEN
-					</Button>
-				</Breadcrumbs>
 
-				{showMenu && (
+			{location.pathname !== '/shopping-cart' &&
+				location.pathname !== '/faqs' && (
 					<Box
 						sx={{
 							display: 'flex',
-							justifyContent: 'center',
+							flexDirection: 'column',
 							alignItems: 'center',
-							margin: '1rem 0',
-							width: '100%',
+							margin: '2rem 0',
 						}}>
-						<Breadcrumbs
-							separator=' '
-							aria-label='breadcrumb'
-							component='men-top'>
-							<Link
-								to={menCategory ? 'men/tops' : 'women/tops'}
-								style={{ textDecoration: 'none' }}>
-								<Typography sx={{ color: 'gray' }}>Tops</Typography>
-							</Link>
-
-							<Link
-								to={menCategory ? 'men/bottoms' : 'women/bottoms'}
-								style={{ textDecoration: 'none' }}>
-								<Typography sx={{ color: 'gray' }}>Bottoms</Typography>
-							</Link>
-
-							<Link
-								to={menCategory ? 'men/shoes' : 'women/shoes'}
-								style={{ textDecoration: 'none' }}>
-								<Typography sx={{ color: 'gray' }}>Shoes</Typography>
-							</Link>
-
-							<Link
-								to={menCategory ? 'men/bags' : 'women/bags'}
-								style={{ textDecoration: 'none' }}>
-								<Typography sx={{ color: 'gray' }}>Bags</Typography>
-							</Link>
-
-							<Link
-								to={menCategory ? 'men/accessories' : 'women/accessories'}
-								style={{ textDecoration: 'none' }}>
-								<Typography sx={{ color: 'gray' }}>Accesories</Typography>
-							</Link>
+						{/* HEADER NAVBAR FOR MEN AND WOMEN */}
+						<Breadcrumbs separator=' '>
+							<Button
+								aria-controls='men-menu'
+								aria-haspopup='true'
+								onClick={handleMenClick}
+								sx={{ color: 'gray' }}>
+								MEN
+							</Button>
+							<Button
+								aria-controls='women-menu'
+								aria-haspopup='true'
+								onClick={handleWomenClick}
+								sx={{ color: 'gray' }}>
+								WOMEN
+							</Button>
 						</Breadcrumbs>
+
+						{showMenu && (
+							<Box
+								sx={{
+									display: 'flex',
+									justifyContent: 'center',
+									alignItems: 'center',
+									margin: '1rem 0',
+									width: '100%',
+								}}>
+								<Breadcrumbs
+									separator=' '
+									aria-label='breadcrumb'
+									component='men-top'>
+									<Link
+										to={menCategory ? 'men/tops' : 'women/tops'}
+										style={{ textDecoration: 'none' }}>
+										<Typography sx={{ color: 'gray' }}>Tops</Typography>
+									</Link>
+
+									<Link
+										to={menCategory ? 'men/bottoms' : 'women/bottoms'}
+										style={{ textDecoration: 'none' }}>
+										<Typography sx={{ color: 'gray' }}>Bottoms</Typography>
+									</Link>
+
+									<Link
+										to={menCategory ? 'men/shoes' : 'women/shoes'}
+										style={{ textDecoration: 'none' }}>
+										<Typography sx={{ color: 'gray' }}>Shoes</Typography>
+									</Link>
+
+									<Link
+										to={menCategory ? 'men/bags' : 'women/bags'}
+										style={{ textDecoration: 'none' }}>
+										<Typography sx={{ color: 'gray' }}>Bags</Typography>
+									</Link>
+
+									<Link
+										to={menCategory ? 'men/accessories' : 'women/accessories'}
+										style={{ textDecoration: 'none' }}>
+										<Typography sx={{ color: 'gray' }}>Accessories</Typography>
+									</Link>
+								</Breadcrumbs>
+							</Box>
+						)}
 					</Box>
 				)}
-			</Box>
 		</Box>
 	);
 };

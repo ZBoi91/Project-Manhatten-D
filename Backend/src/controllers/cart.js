@@ -183,10 +183,38 @@ const updateCartItem = async (req, res) => {
 	}
 };
 
+const clearCart = async (req, res) => {
+	try {
+		const cartId = req.params.cartId;
+		console.log(cartId);
+		const cart = await CartModel.findById(cartId);
+
+		if (!cart) {
+			return res.status(404).json({ status: 'error', msg: 'no cart found!' });
+		}
+
+		//initialising cart to original empty state
+		cart.items = [];
+		cart.totalAmount = 0;
+
+		await cart.save();
+
+		res.status(200).json({
+			status: 'ok',
+			msg: 'All items removed from cart!',
+			cart: cart,
+		});
+	} catch (error) {
+		console.log(error.message);
+		res.status(500).json({ status: 'error', msg: 'error clearing cart' });
+	}
+};
+
 module.exports = {
 	getCart,
 	addNewCart,
 	deleteItemFromCart,
 	updateCartItem,
 	createEmptyCart,
+	clearCart,
 };

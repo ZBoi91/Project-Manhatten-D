@@ -21,7 +21,7 @@ function CheckoutForm() {
 	const [address, setAddress] = useState([]);
 	const navigate = useNavigate();
 	const shoppingCtx = useContext(ShoppingContext);
-	const { cartId } = shoppingCtx;
+	const { cartId, getItems, clearCartArray } = shoppingCtx;
 
 	const fullNameRef = useRef();
 	const addressLine1Ref = useRef();
@@ -100,7 +100,7 @@ function CheckoutForm() {
 	};
 	const createPaymentIntent = async (cartId) => {
 		try {
-			const response = await fetch(
+			const res = await fetch(
 				`${import.meta.env.VITE_SERVER}/api1/payment/intent/${cartId}`,
 				{
 					method: 'POST',
@@ -110,12 +110,36 @@ function CheckoutForm() {
 				}
 			);
 
-			const data = await response.json();
+			const data = await res.json();
 			setClientSecret(data.clientSecret);
 			return data.clientSecret;
 		} catch (error) {
 			console.log(error.message);
 			alert('error creating payment intent!');
+		}
+	};
+
+	//DELETE clear cart
+	const clearCart = async (cartId) => {
+		try {
+			const res = await fetch(
+				`${import.meta.env.VITE_SERVER}/api2/cart/all/${cartId}`,
+				{
+					method: 'DELETE',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+				}
+			);
+			const data = await res.json();
+
+			if (res.ok) {
+				getItems();
+			} else {
+				console.log('error clearing cart');
+			}
+		} catch (error) {
+			console.error(error);
 		}
 	};
 
@@ -163,6 +187,8 @@ function CheckoutForm() {
 				setLoading(false);
 			} else {
 				alert('Payment successful!');
+				clearCart(cartId);
+				clearCartArray();
 				navigate('/shopping-cart/checkout/payment');
 			}
 		}
@@ -304,7 +330,6 @@ function CheckoutForm() {
 						} else {
 							handleSubmit(cartId);
 						}
-						console.log(fullNameRef.current.value);
 					}}
 					type={activeStep === 0 ? 'button' : 'submit'}
 					variant='contained'
