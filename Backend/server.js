@@ -12,7 +12,6 @@ const stripe = require('stripe')(process.env.TEST_KEY); //test key needed to acc
 connectDB();
 const cors = require('cors');
 const app = express();
-const userRoutes = require('./src/routers/userRoutes');
 
 app.use(cors());
 app.use(express.json());

@@ -32,7 +32,6 @@ function CheckoutForm() {
 	const postalCodeRef = useRef();
 	const emailAddressRef = useRef();
 
-	const [clientSecret, setClientSecret] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const [activeStep, setActiveStep] = useState(0);
 	const steps = ['Shipping Details', 'Payment Information'];
@@ -111,7 +110,6 @@ function CheckoutForm() {
 			);
 
 			const data = await res.json();
-			setClientSecret(data.clientSecret);
 			return data.clientSecret;
 		} catch (error) {
 			console.log(error.message);
@@ -146,6 +144,8 @@ function CheckoutForm() {
 	const handleSubmit = async (cartId) => {
 		setLoading(true);
 		console.log(cartId);
+
+		//retrieving clientsecret
 		const receivedClientSecret = await createPaymentIntent(cartId);
 
 		if (!receivedClientSecret) {
@@ -158,7 +158,7 @@ function CheckoutForm() {
 
 		const { error, paymentMethod } = await stripe.createPaymentMethod({
 			type: 'card',
-			card: elements.getElement(CardElement),
+			card: elements.getElement(CardElement), //stripe's UI for creditcard info
 			billing_details: {
 				name: address.fullName,
 				address: {
@@ -170,11 +170,13 @@ function CheckoutForm() {
 			},
 		});
 
+		//if error is true
 		if (error) {
 			console.error(error);
 			alert('error with payment');
 			setLoading(false);
 		} else {
+			//refractoring error to confirmationError just to make it neater
 			const { error: confirmationError } = await stripe.confirmCardPayment(
 				clientSecret,
 				{
@@ -182,6 +184,7 @@ function CheckoutForm() {
 				}
 			);
 
+			//if error is true
 			if (confirmationError) {
 				console.log('Error confirming PaymentIntent:', confirmationError);
 				setLoading(false);
@@ -233,7 +236,7 @@ function CheckoutForm() {
 							<TextField
 								fullWidth
 								required
-								label='Address'
+								label='Address Line 1'
 								name='addressline1'
 								inputRef={addressLine1Ref}
 							/>
@@ -242,7 +245,7 @@ function CheckoutForm() {
 							<TextField
 								fullWidth
 								required
-								label='Address'
+								label='Address Line 2'
 								name='addressline2'
 								inputRef={addressLine2Ref}
 							/>
@@ -269,8 +272,8 @@ function CheckoutForm() {
 							<TextField
 								fullWidth
 								required
-								label='Address'
-								name='address'
+								label='Country'
+								name='country'
 								inputRef={countryRef}
 							/>
 						</Box>
@@ -299,6 +302,7 @@ function CheckoutForm() {
 						<Box
 							mb={4}
 							mt={4}>
+							{/* Stripe's CreditCard TextField */}
 							<CardElement
 								options={{
 									style: {
@@ -319,6 +323,7 @@ function CheckoutForm() {
 					</>
 				)}
 				<Button
+					sx={{ marginBottom: '2rem' }}
 					onClick={() => {
 						if (activeStep === 0) {
 							if (validateFields()) {
